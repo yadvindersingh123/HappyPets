@@ -1,17 +1,49 @@
-# happypets
+# 🐾 HappyPets
 
-A new Flutter project.
+HappyPets is a Flutter-based pet care application that helps pet owners manage their pets and connect with veterinary doctors online.
+
+The application provides a complete pet care experience, including pet profile management, health tracking, appointment scheduling, doctor consultations, and timely reminders to ensure the well-being of pets.
+
+## Features
+
+* Pet profile management
+* Health and vaccination tracking
+* Online veterinary consultations
+* Appointment booking and management
+* Medication and vaccination reminders
+* User-friendly and responsive interface
+* Secure and organized pet care records
+
+## Technology Stack
+
+* Flutter
+* Dart
+* Firebase
+* REST APIs
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
 
-A few resources to get you started if this is your first Flutter project:
+* Flutter SDK
+* Android Studio or VS Code
+* Android/iOS device or emulator
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+### Installation
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# HappyPets
+```bash
+git clone https://github.com/yadvindersingh123/happypets.git
+cd happypets
+flutter pub get
+flutter run
+```
+
+## Purpose
+
+HappyPets aims to simplify pet care by providing a centralized platform where pet owners can monitor their pets' health, manage appointments, and access veterinary support anytime.
+
+## Developer
+
+**Yadvinder Singh**
+
+GitHub: https://github.com/yadvindersingh123
