@@ -1,6 +1,5 @@
-import 'package:HAPPYPETS/screens/home.dart';
+import 'package:HAPPYPETS/widgets/pet_bottom_navigation.dart';
 import 'package:flutter/material.dart';
-import 'package:HAPPYPETS/screens/social meadia.dart';
 
 class Social extends StatefulWidget {
   const Social({super.key});
@@ -11,7 +10,6 @@ class Social extends StatefulWidget {
 
 class _SocialState extends State<Social> {
   final ScrollController _scrollController = ScrollController();
-  int _selectedIndex = 1; // Add this line to define the selected index
 
   final List<Map<String, dynamic>> _allPosts = [
     {
@@ -119,6 +117,7 @@ class _SocialState extends State<Social> {
     });
 
     await Future.delayed(const Duration(seconds: 1)); // Simulate network delay
+    if (!mounted) return;
 
     setState(() {
       final remainingPosts = _allPosts.length - _displayedPosts.length;
@@ -126,7 +125,8 @@ class _SocialState extends State<Social> {
 
       if (nextPosts > 0) {
         _displayedPosts.addAll(
-          _allPosts.getRange(_displayedPosts.length, _displayedPosts.length + nextPosts),
+          _allPosts.getRange(
+              _displayedPosts.length, _displayedPosts.length + nextPosts),
         );
       }
 
@@ -135,7 +135,8 @@ class _SocialState extends State<Social> {
   }
 
   void _onScroll() {
-    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
       _loadMorePosts();
     }
   }
@@ -168,78 +169,7 @@ class _SocialState extends State<Social> {
           }
         },
       ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.3),
-              spreadRadius: 1,
-              blurRadius: 5,
-              offset: const Offset(0, -3),
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            if (index != _selectedIndex) {  // Only navigate if selecting a different tab
-              setState(() {
-                _selectedIndex = index;
-              });
-              
-              switch (index) {
-                case 0:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Home()),
-                  );
-                  break;
-                case 3:
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Home()),
-                  );
-                  break;
-                // Removed case 4 since we're already on Social screen
-              }
-            }
-          },
-          selectedItemColor: Colors.blue,
-          unselectedItemColor: Colors.black,
-          selectedFontSize: MediaQuery.of(context).size.width * 0.035,
-          unselectedFontSize: MediaQuery.of(context).size.width * 0.03,
-          iconSize: MediaQuery.of(context).size.width * 0.07,
-          type: BottomNavigationBarType.fixed,
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home,
-                color: Colors.black,
-              ),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.search,
-                color: Colors.black,),
-              label: 'Search',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.upload_file,
-                color: Colors.black,),
-              label: 'Upload',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.design_services,
-                color: Colors.black,),
-              label: 'Services',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.account_circle,
-                color: Colors.black,),
-              label: 'Profile',
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: const PetBottomNavigation(currentIndex: 0),
     );
   }
 
@@ -247,10 +177,18 @@ class _SocialState extends State<Social> {
     {'username': 'John', 'comment': 'Such a cute dog! 🐕', 'time': '1h ago'},
     {'username': 'Sarah', 'comment': 'Adorable! ❤️', 'time': '2h ago'},
     {'username': 'Mike', 'comment': 'Looking good!', 'time': '3h ago'},
-    {'username': 'Emma', 'comment': 'What a lovely picture! 😍', 'time': '4h ago'},
+    {
+      'username': 'Emma',
+      'comment': 'What a lovely picture! 😍',
+      'time': '4h ago'
+    },
     {'username': 'David', 'comment': 'Great shot!', 'time': '5h ago'},
     {'username': 'Lisa', 'comment': 'This made my day! 🌟', 'time': '6h ago'},
-    {'username': 'Alex', 'comment': 'Beautiful moment captured', 'time': '7h ago'},
+    {
+      'username': 'Alex',
+      'comment': 'Beautiful moment captured',
+      'time': '7h ago'
+    },
     {'username': 'Sophie', 'comment': 'So precious! 💖', 'time': '8h ago'},
     {'username': 'James', 'comment': 'Fantastic photo!', 'time': '9h ago'},
     {'username': 'Olivia', 'comment': 'Love this! 🐾', 'time': '10h ago'},
@@ -259,11 +197,23 @@ class _SocialState extends State<Social> {
     {'username': 'William', 'comment': 'Perfect timing!', 'time': '13h ago'},
     {'username': 'Ava', 'comment': 'Absolutely adorable! ✨', 'time': '14h ago'},
     {'username': 'Lucas', 'comment': 'Great composition!', 'time': '15h ago'},
-    {'username': 'Isabella', 'comment': 'This is everything! 💫', 'time': '16h ago'},
+    {
+      'username': 'Isabella',
+      'comment': 'This is everything! 💫',
+      'time': '16h ago'
+    },
     {'username': 'Henry', 'comment': 'Wonderful capture!', 'time': '17h ago'},
-    {'username': 'Sophia', 'comment': 'So much joy in this photo! 🌈', 'time': '18h ago'},
+    {
+      'username': 'Sophia',
+      'comment': 'So much joy in this photo! 🌈',
+      'time': '18h ago'
+    },
     {'username': 'Jack', 'comment': 'Brilliant shot!', 'time': '19h ago'},
-    {'username': 'Emily', 'comment': 'This is pure happiness! 💝', 'time': '20h ago'}
+    {
+      'username': 'Emily',
+      'comment': 'This is pure happiness! 💝',
+      'time': '20h ago'
+    }
   ];
 
   void _showCommentDialog(BuildContext context, int postIndex) {
@@ -447,7 +397,8 @@ class _SocialState extends State<Social> {
                               post['isLiked'] = !isLiked;
                             });
                             setState(() {
-                              _displayedPosts[index]['isLiked'] = post['isLiked'];
+                              _displayedPosts[index]['isLiked'] =
+                                  post['isLiked'];
                             });
                           },
                         ),
@@ -459,7 +410,8 @@ class _SocialState extends State<Social> {
                       children: [
                         IconButton(
                           icon: const Icon(Icons.comment_outlined),
-                          onPressed: () => _showCommentDialog(context, post['comments']),
+                          onPressed: () =>
+                              _showCommentDialog(context, post['comments']),
                         ),
                         Text('${post['comments']}'),
                       ],

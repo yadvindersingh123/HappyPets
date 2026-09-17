@@ -1,3 +1,4 @@
+import 'package:HAPPYPETS/services/pet_profile_store.dart';
 import 'dart:io';
 
 import 'package:HAPPYPETS/models.dart';
@@ -28,7 +29,7 @@ class _AddPhotoState extends State<AddPhoto> {
       source: ImageSource.gallery,
     );
 
-    if (pickedFile != null) {
+    if (mounted && pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
       });
@@ -40,7 +41,7 @@ class _AddPhotoState extends State<AddPhoto> {
       source: ImageSource.camera,
     );
 
-    if (pickedFile != null) {
+    if (mounted && pickedFile != null) {
       setState(() {
         _imageFile = File(pickedFile.path);
       });
@@ -48,6 +49,7 @@ class _AddPhotoState extends State<AddPhoto> {
   }
 
   Future<void> _savePet() async {
+    if (_isSaving) return;
     if (_imageFile == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -63,6 +65,8 @@ class _AddPhotoState extends State<AddPhoto> {
 
     try {
       widget.pet.image = _imageFile!.path;
+      await PetProfileStore.save(widget.pet, await _imageFile!.readAsBytes());
+      if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -77,6 +81,7 @@ class _AddPhotoState extends State<AddPhoto> {
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Failed to save pet data: $e'),
@@ -123,7 +128,7 @@ class _AddPhotoState extends State<AddPhoto> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     GestureDetector(
-                      onTap: _pickImage,
+                      onTap: _isSaving ? null : _pickImage,
                       child: Container(
                         width: imageSize,
                         height: imageSize,
@@ -182,7 +187,7 @@ class _AddPhotoState extends State<AddPhoto> {
                     SizedBox(
                       width: screenSize.width * 0.8,
                       child: ElevatedButton(
-                        onPressed: _openCamera,
+                        onPressed: _isSaving ? null : _openCamera,
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.white,
                           backgroundColor: Colors.green,

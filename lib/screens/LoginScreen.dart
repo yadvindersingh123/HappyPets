@@ -1,8 +1,8 @@
-import 'package:HAPPYPETS/screens/AddPet3.dart';
-import 'package:HAPPYPETS/screens/SignUp2.dart';
-import 'package:HAPPYPETS/screens/sign%20up.dart';
+import 'dart:async';
+
+import 'package:HAPPYPETS/screens/otp.dart';
 import 'package:flutter/material.dart';
-import 'forget password.dart';
+import 'package:flutter/services.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -12,281 +12,179 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  final _phoneController = TextEditingController();
 
-  bool isLoading = false;
+  static const _countryCodes = {
+    'India': '+91',
+    'United States / Canada': '+1',
+    'United Kingdom': '+44',
+    'Australia': '+61',
+    'United Arab Emirates': '+971',
+    'Singapore': '+65',
+    'Nepal': '+977',
+    'Sri Lanka': '+94',
+    'Bangladesh': '+880',
+    'Pakistan': '+92',
+    'Germany': '+49',
+    'France': '+33',
+    'Japan': '+81',
+    'China': '+86',
+    'South Africa': '+27',
+  };
+  String _country = 'India';
+  bool _loading = false;
+  Timer? _continueTimer;
 
-  void login() {
-    final String email = emailController.text.trim();
-    final String password = passwordController.text.trim();
-
-    if (email.isEmpty || password.isEmpty) {
-      showErrorDialog('Please enter email and password');
-      return;
-    }
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Addpet3(),
-      ),
-    );
+  void _login() {
+    if (_loading || !_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
+    final phoneNumber =
+        '${_countryCodes[_country]} ${_phoneController.text.trim()}';
+    setState(() => _loading = true);
+    _continueTimer = Timer(const Duration(seconds: 1), () {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OtpScreen(phoneNumber: phoneNumber),
+        ),
+      );
+    });
   }
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    _continueTimer?.cancel();
+    _phoneController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(screenSize.width * 0.12),
+      body: SafeArea(
         child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(height: screenSize.height * 0.08),
-              Image.asset(
-                'assets/HAPPYPETS.jpg',
-                width: screenSize.width * 0.25,
-                height: screenSize.width * 0.25,
-              ),
-              SizedBox(height: screenSize.height * 0.04),
-              TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                style: TextStyle(fontSize: screenSize.width * 0.04),
-                decoration: InputDecoration(
-                  labelText: 'Email',
-                  hintText: 'Enter email',
-                  prefixIcon: Icon(Icons.email, size: screenSize.width * 0.06),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                  ),
-                ),
-              ),
-              SizedBox(height: screenSize.height * 0.03),
-              TextField(
-                controller: passwordController,
-                keyboardType: TextInputType.visiblePassword,
-                obscureText: true,
-                style: TextStyle(fontSize: screenSize.width * 0.04),
-                decoration: InputDecoration(
-                  labelText: 'Password',
-                  hintText: 'Enter password',
-                  prefixIcon: Icon(Icons.password, size: screenSize.width * 0.06),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(screenSize.width * 0.02),
-                  ),
-                ),
-              ),
-              SizedBox(height: screenSize.height * 0.02),
-              Align(
-                alignment: Alignment.bottomRight,
-                child: TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => const forget()),
-                    );
-                  },
-                  child: Text.rich(
-                    TextSpan(
-                      text: 'Forgot Password? ',
-                      style: TextStyle(
-                        fontSize: screenSize.width * 0.04,
-                        color: Colors.black,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: 'Click',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w300,
-                            color: Colors.red,
-                            fontSize: screenSize.width * 0.04,
-                          ),
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 420),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Image.asset('assets/HAPPYPETS.jpg', height: 160),
+                    const SizedBox(height: 32),
+                    const Text(
+                      'Sign in with phone number',
+                      textAlign: TextAlign.center,
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    const Text(
+                      'Enter your phone number to continue to HappyPets.',
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
+                    InputDecorator(
+                      decoration: InputDecoration(
+                        labelText: 'Country code',
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: screenSize.height * 0.03),
-              ElevatedButton(
-                onPressed: isLoading ? null : login,
-                style: ElevatedButton.styleFrom(
-                  foregroundColor: Colors.black,
-                  backgroundColor: Colors.blue.shade50,
-                  minimumSize: Size(double.infinity, screenSize.height * 0.06),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(screenSize.width * 0.08),
-                  ),
-                ),
-                child: isLoading
-                    ? SizedBox(
-                  height: screenSize.width * 0.05,
-                  width: screenSize.width * 0.05,
-                  child: const CircularProgressIndicator(),
-                )
-                    : Text(
-                  'Login',
-                  style: TextStyle(fontSize: screenSize.width * 0.04),
-                ),
-              ),
-              SizedBox(height: screenSize.height * 0.02),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                    child: Divider(thickness: 1, color: Colors.black),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: screenSize.width * 0.02,
-                    ),
-                    child: Text(
-                      'Or',
-                      style: TextStyle(
-                        fontSize: screenSize.width * 0.04,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<String>(
+                          value: _country,
+                          isExpanded: true,
+                          isDense: true,
+                          items: _countryCodes.entries.map((country) {
+                            return DropdownMenuItem(
+                              value: country.key,
+                              child: Text('${country.key} (${country.value})'),
+                            );
+                          }).toList(),
+                          onChanged: _loading
+                              ? null
+                              : (country) {
+                                  if (country != null) {
+                                    setState(() => _country = country);
+                                    if (_phoneController.text.isNotEmpty) {
+                                      _formKey.currentState!.validate();
+                                    }
+                                  }
+                                },
+                        ),
                       ),
                     ),
-                  ),
-                  const Expanded(
-                    child: Divider(thickness: 1, color: Colors.black),
-                  ),
-                ],
-              ),
-              SizedBox(height: screenSize.height * 0.03),
-              _buildSignUpButton(
-                text: 'Sign UP with Email',
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignUp()),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      enabled: !_loading,
+                      controller: _phoneController,
+                      keyboardType: TextInputType.phone,
+                      textInputAction: TextInputAction.done,
+                      autofillHints: const [
+                        AutofillHints.telephoneNumberNational
+                      ],
+                      inputFormatters: [
+                        FilteringTextInputFormatter.digitsOnly,
+                        LengthLimitingTextInputFormatter(14),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'Phone number',
+                        hintText: 'Enter phone number',
+                        prefixIcon: const Icon(Icons.phone_outlined),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      validator: (value) {
+                        final phone =
+                            (value ?? '').replaceAll(RegExp(r'[ ()-]'), '');
+                        if (phone.isEmpty) {
+                          return 'Please enter your phone number';
+                        }
+                        if (_country == 'India' && phone.length != 10) {
+                          return 'Enter a valid 10-digit phone number';
+                        }
+                        if (phone.length < 6 ||
+                            phone.length + _countryCodes[_country]!.length - 1 >
+                                15) {
+                          return 'Enter a valid phone number for this country code';
+                        }
+                        return null;
+                      },
+                      onFieldSubmitted: (_) => _login(),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _loading ? null : _login,
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.black,
+                        backgroundColor: Colors.blue.shade50,
+                        minimumSize: const Size(double.infinity, 52),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                      ),
+                      child: _loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Continue'),
+                    ),
+                  ],
                 ),
-                screenSize: screenSize,
               ),
-              SizedBox(height: screenSize.height * 0.03),
-              _buildSignUpButton(
-                text: 'Sign UP Phone Number',
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignUp2()),
-                ),
-                screenSize: screenSize,
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSignUpButton({
-    required String text,
-    required VoidCallback onPressed,
-    required Size screenSize,
-  }) {
-    return ElevatedButton(
-      onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.black,
-        backgroundColor: Colors.blue.shade50,
-        minimumSize: Size(double.infinity, screenSize.height * 0.05),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(screenSize.width * 0.04),
-        ),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(fontSize: screenSize.width * 0.04),
-      ),
-    );
-  }
-
-  void showAlertDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return const Alert();
-      },
-    );
-  }
-
-  void showErrorDialog(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Error'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class Alert extends StatefulWidget {
-  const Alert({super.key});
-
-  @override
-  State<Alert> createState() => _AlertState();
-}
-
-class _AlertState extends State<Alert> {
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      backgroundColor: Colors.white38,
-      content: SizedBox(
-        width: 300,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20.0),
-              child: Image.asset(
-                'assets/nerror.jpg',
-                width: 200,
-                height: 200,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Make sure WiFi or cellular data is turned on and then try again.',
-            ),
-            const SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              style: ElevatedButton.styleFrom(
-                foregroundColor: Colors.white,
-                backgroundColor: Colors.red,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
-                ),
-              ),
-              child: const Text('Retry'),
-            ),
-          ],
         ),
       ),
     );
